@@ -16,6 +16,9 @@ app.use(express.static(__dirname + '/public'));
  * DATABASE *
  ************/
 
+var albumGenres = [];
+
+
 /**********
  * ROUTES *
  **********/
@@ -52,8 +55,18 @@ app.get('/api/albums', function album_index(req, res){
 });
 
 app.post('/api/albums', function createAlbum(req, res){
-  console.log(req.body);
+ var newAlbum = new db.Album({
   
+  artistName: req.body.artistName,
+  name: req.body.name,
+  releaseDate: req.body.releaseDate,
+  genres: req.body.genres
+
+ });
+ newAlbum.save(function(err, album) {
+  if(err) {return console.log('save error', err);}
+  res.json(album);
+ }); 
 });
 /**********
  * SERVER *
