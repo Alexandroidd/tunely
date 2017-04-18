@@ -50,28 +50,74 @@ $(document).ready(function() {
       console.log("submit");
       console.log(formData);
 
-    $.ajax({
-      url: '/api/albums',
-      type: 'POST',
-      data: formData,
-      success: console.log("success")
+      $.ajax({
+        url: '/api/albums',
+        type: 'POST',
+        data: formData,
+        success: console.log("success")
+      });
+        $(this).trigger('reset');
     });
+  });
+  
+  $('#albums').on('click', '.add-song', function(e) {
+    console.log('asdfasdfasdf');
+    var id = $(this).parents('.album').data('album-id'); // "5665ff1678209c64e51b4e7b"
+    console.log('id',id);
+    
+    $('#songModal').data('album-id', id);
+    $('#songModal').modal();
 
 
-      $(this).trigger('reset');
+    $('#saveSong').click(function handleNewSongSubmit(e){
+      e.preventDefault();
+      var id = $('#songModal').data('album-id');
+      console.log(id);
+      var songName = $('#songName').val();
+      var trackNumber = $('#trackNumber').val();
+      var songData = {
+        name: songName,
+        trackNumber: trackNumber
+      };
+
+       $.ajax({
+            url: '/api/albums/' + id + '/songs',
+            type: 'POST',
+            data: songData,
+            success: [function(data) {
+              $('.album[data-album-id=' + id + ']').remove();
+              renderAlbum(data);
+            }]
+
+        });
+        $('#songName').val("");
+        $('#trackNumber').val("");
+        $('#songModal').modal('toggle');
     });
+
   });
 });
 
 
-
 // this function takes a single album and renders it to the page
 function renderAlbum(album) {
+  function buildSongsHtml(songs) {
+    var songText = ' - ';
+    songs.forEach(function(song) {
+      songText = songText + '(' + song.trackNumber + ') ' + song.name + ' - '; 
+    });
+    var songsHtml = songText;
+
+    return songsHtml; 
+  }
+
+
+
   console.log('rendering album:', album);
 
   var albumHtml =
   "        <!-- one album -->" +
-  "        <div class='row album' data-album-id='" + album.id + "'>" +
+  "        <div class='row album' data-album-id='" + album._id + "'>" +
   "          <div class='col-md-10 col-md-offset-1'>" +
   "            <div class='panel panel-default'>" +
   "              <div class='panel-body'>" +
@@ -94,6 +140,10 @@ function renderAlbum(album) {
   "                        <h4 class='inline-header'>Released date:</h4>" +
   "                        <span class='album-releaseDate'>" + album.releaseDate + "</span>" +
   "                      </li>" +
+  "                       <li class='list-group-item'>" +
+  "                       <h4 class='inline-header'>Songs:</h4" +
+  "                       <span>" + buildSongsHtml(album.songs) + "</span>" +
+  "                     </li>" +
   "                    </ul>" +
   "                  </div>" +
   "                </div>" +
@@ -102,6 +152,7 @@ function renderAlbum(album) {
   "              </div>" + // end of panel-body
 
   "              <div class='panel-footer'>" +
+  "              <button class = 'btn btn-primary add-song'>Add Song</button>" + 
   "              </div>" +
 
   "            </div>" +
@@ -111,9 +162,10 @@ function renderAlbum(album) {
   // render to the page with jQuery
 $('#albums').append(albumHtml);
 
-
-
-
 }
 
+
+// <div class='panel-footer'>
+//   <button class='btn btn-primary add-song'>Add Song</button>
+// </div>
 

@@ -39,49 +39,89 @@ var albumsList = [
               artistName: 'the Old Kanye',
               name: 'The College Dropout',
               releaseDate: '2004, February 10',
-              genres: [ 'rap', 'hip hop' ],
-              songs: sampleSongs
+              genres: [ 'rap', 'hip hop' ]
+              
               
             },
 {
               artistName: 'the New Kanye',
               name: 'The Life of Pablo',
               releaseDate: '2016, Febraury 14',
-              genres: [ 'hip hop' ],
-              songs: []
+              genres: [ 'hip hop' ]
+              
 
             },
 {
               artistName: 'the always rude Kanye',
               name: 'My Beautiful Dark Twisted Fantasy',
               releaseDate: '2010, November 22',
-              genres: [ 'rap', 'hip hop' ],
-              songs: []
+              genres: [ 'rap', 'hip hop' ]
+              
             },
 {
               artistName: 'the sweet Kanye',
               name: '808s & Heartbreak',
               releaseDate: '2008, November 24',
-              genres: [ 'r&b', 'electropop', 'synthpop' ],
-              songs: []
+              genres: [ 'r&b', 'electropop', 'synthpop' ]
+              
             }
 ];
 
 
 
-console.log(sampleSongs);
 
 
+
+db.Song.remove({}, function(err,songs){
+  console.log('removed all songs');
+  db.Song.create(sampleSongs, function(err, songs){
+    if (err) 
+      {console.log('song error', err);
+      return;
+  }
+    console.log('created' + songs.length + 'songs');
 
 
 db.Album.remove({}, function(err, albums){
-
-  db.Album.create(albumsList, function(err, albums){
-    if (err) { return console.log('ERROR', err); }
-
-    console.log("all albums:", albums);
-    console.log("created", albums.length, "albums");
-    process.exit();
+  console.log('removed all albums');
+  albumsList.forEach(function (albumData) {
+    var album = new db.Album({
+      artistName: albumData.artistName,
+      name: albumData.name,
+      releaseDate: albumData.releaseDate,
+      genres: albumData.genres
+  });	
+    db.Song.find({}, function(err, foundSong){
+      console.log('found song ' + foundSong.name + ' for album ' + album.name);
+      if(err) {
+        console.log(err);
+        return;
+      }
+      album.songs = foundSong;
+      album.save (function (err, savedAlbum){
+        if(err) {
+          console.log('err');
+        }
+        console.log(savedAlbum);
+      });
+    });
   });
-
+ 
 });
+});
+   // process.exit();
+});
+
+
+
+//   db.Album.create(albumsList, function(err, albums){
+//     if (err) { return console.log('ERROR', err); }
+
+
+
+//     console.log("all albums:", albums);
+//     console.log("created", albums.length, "albums");
+    
+//   });
+
+// });
