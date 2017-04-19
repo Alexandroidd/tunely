@@ -43,6 +43,7 @@ $(document).ready(function() {
     res.forEach(function(album){
       renderAlbum(album);
     });
+  });
 
     $('form').submit(function(event){
       event.preventDefault();
@@ -54,9 +55,11 @@ $(document).ready(function() {
         url: '/api/albums',
         type: 'POST',
         data: formData,
-        success: console.log("success")
-      });
-        $(this).trigger('reset');
+        success:
+        function makeAlbum(data) {
+          renderAlbum(data);
+         $(this).trigger('reset');
+        }
     });
   });
   

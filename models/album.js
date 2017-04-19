@@ -9,10 +9,7 @@ var AlbumSchema = new Schema ({
 	name: String,
 	releaseDate: String,
 	genres: [String],
-	songs: {
-		type: Schema.Types,
-		ref: 'Song'
-	}
+	songs: [Song.schema]
 
 
 });
